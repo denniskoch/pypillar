@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Plate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+
+        <div class="company-header">
+            <span class="company-name" id="company-name"></span>
+            <div class="accent-line"></div>
+        </div>
+
+        <div class="identity">
+            <h1 class="name">
+                <span id="name-first"></span><br>
+                <span id="name-last"></span>
+            </h1>
+            <div class="divider"></div>
+            <p class="title" id="title"></p>
+            <div class="divider"></div>
+
+            <div class="status-section">
+                <div class="status-glow" id="status-glow"></div>
+                <span class="status-label" id="status-text"></span>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="clock-section">
+                <div class="clock-time" id="clock-time">
+                    <span id="clock-h"></span><span class="clock-colon">:</span><span id="clock-m"></span><span id="clock-ampm"></span>
+                </div>
+                <div class="clock-date" id="clock-date"></div>
+            </div>
+
+            <div class="fact-section">
+                <div class="fact-label">DID YOU KNOW</div>
+                <div class="fact-text" id="fact-text"></div>
+            </div>
+        </div>
+
+        <div class="bottom-glow"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
