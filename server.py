@@ -30,8 +30,7 @@ SCOPES        = ["https://graph.microsoft.com/.default"]
 GRAPH_BASE    = "https://graph.microsoft.com/v1.0"
 POLL_INTERVAL = 30  # seconds
 
-state: dict = {"profile": None, "presence": "Unknown"}
-
+state: dict = {"profile": None, "presence": "Unknown", "workLocation": None}
 
 # ── MSAL ──────────────────────────────────────────────
 
@@ -49,19 +48,18 @@ def _get_token() -> str:
 
 # ── Graph polling ─────────────────────────────────────
 
-def _parse_name(display_name: str) -> tuple[str, str]:
-    """
-    Returns (first, last) as uppercase strings.
-    Handles both 'John Doe' and 'Doe, John' formats.
-    """
-    if "," in display_name:
-        last, _, first = display_name.partition(",")
+def _parse_name(me: dict) -> tuple[str, str]:
+    """Returns (first, last) as uppercase strings, using givenName/surname
+    with displayName as a fallback for accounts that don't populate them."""
+    first = me.get("givenName") or ""
+    last  = me.get("surname") or ""
+    if first or last:
         return first.strip().upper(), last.strip().upper()
-    parts = display_name.rsplit(" ", 1)
+    # fallback: split displayName on last space
+    parts = me.get("displayName", "").rsplit(" ", 1)
     if len(parts) == 2:
         return parts[0].upper(), parts[1].upper()
-    return display_name.upper(), ""
-
+    return me.get("displayName", "").upper(), ""
 
 async def _poll_graph() -> None:
     loop = asyncio.get_running_loop()
@@ -78,7 +76,7 @@ async def _poll_graph() -> None:
 
             if me_res.status_code == 200:
                 me = me_res.json()
-                first, last = _parse_name(me.get("displayName", ""))
+                first, last = _parse_name(me)
                 state["profile"] = {
                     "firstName": first,
                     "lastName":  last,
@@ -86,7 +84,9 @@ async def _poll_graph() -> None:
                 }
 
             if presence_res.status_code == 200:
-                state["presence"] = presence_res.json().get("availability", "Unknown")
+                presence = presence_res.json()
+                state["presence"]     = presence.get("availability", "Unknown")
+                state["workLocation"] = (presence.get("workLocation") or {}).get("workLocationType")
 
         except Exception as exc:
             print(f"Graph poll error: {exc}", flush=True)
@@ -113,6 +113,7 @@ def get_status():
         "company":  COMPANY_NAME,
         "profile":  state["profile"],
         "presence": state["presence"],
+        "workLocation": state["workLocation"],
     })
 
 

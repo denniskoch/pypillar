@@ -5,40 +5,55 @@ const STATUS_GLOW_COLOR = {
     away:      '#f59e0b',
 };
 
-function setStatus(availability) {
+function setStatus(availability, workLocation) {
     const text = document.getElementById('status-text');
     const glow = document.getElementById('status-glow');
 
     text.className = 'status-label';
 
+    let label   = 'Offline';
     let glowKey = 'away';
+    let showRemote = false;
+
     switch (availability) {
         case 'Available':
             text.classList.add('available');
-            text.textContent = 'Available';
+            label   = 'Available';
             glowKey = 'available';
+            showRemote = true;
             break;
         case 'Busy':
         case 'DoNotDisturb':
             text.classList.add('busy');
-            text.textContent = availability === 'DoNotDisturb' ? 'Do Not Disturb' : 'Meeting';
+            label   = availability === 'DoNotDisturb' ? 'Do Not Disturb' : 'In a Meeting';
             glowKey = 'busy';
+            showRemote = true;
             break;
         case 'BeRightBack':
             text.classList.add('away');
-            text.textContent = 'Be Right Back';
+            label = 'Be Right Back';
+            showRemote = true;
             break;
         case 'OutOfOffice':
             text.classList.add('away');
-            text.textContent = 'Out of Office';
+            label = 'Out of Office';
             break;
         case 'Away':
+            text.classList.add('away');
+            label = 'Away';
+            showRemote = true;
+            break;
         case 'Offline':
         case 'PresenceUnknown':
         default:
             text.classList.add('away');
-            text.textContent = 'Offline';
+            label = 'Offline';
     }
+
+    const isRemote = showRemote && workLocation === 'remote';
+    text.innerHTML = isRemote
+        ? `${label}<span class="remote-badge">Remote</span>`
+        : label;
 
     glow.style.background = STATUS_GLOW_COLOR[glowKey];
 }
