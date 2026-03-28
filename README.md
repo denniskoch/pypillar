@@ -46,7 +46,8 @@ A workplace nameplate and presence display for a Raspberry Pi 4 connected to a 4
 ## Installation
 
 ```bash
-git clone https://github.com/yourname/pypillar.git
+cd /opt
+git clone https://github.com/denniskoch/pypillar.git
 cd pypillar
 python -m venv .venv
 source .venv/bin/activate
@@ -118,11 +119,15 @@ For a fullscreen Chromium kiosk at boot, add to `/etc/xdg/lxsession/LXDE-pi/auto
 | Teams status | Display label | Color |
 |---|---|---|
 | Available | Available | Green |
-| Busy | Meeting | Red |
+| Busy | In a Meeting | Red |
 | DoNotDisturb | Do Not Disturb | Red |
 | BeRightBack | Be Right Back | Amber |
 | OutOfOffice | Out of Office | Amber |
-| Away / Offline | Offline | Amber |
+| Away | Away | Amber |
+| Offline | Offline | Amber |
+| PresenceUnknown | Offline | Amber |
+
+When `workLocation` is `remote`, a **Remote** badge is appended to the label for: Available, Busy, DoNotDisturb, BeRightBack, and Away.
 
 ---
 

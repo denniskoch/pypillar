@@ -1,0 +1,14 @@
+[Unit]
+Description=PyPillar
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pillar
+WorkingDirectory=/opt/pypillar
+EnvironmentFile=/opt/pypillar/.env
+ExecStart=/opt/pypillar/.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
