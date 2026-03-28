@@ -75,7 +75,7 @@ async function fetchStatus() {
         }
 
         if (data.presence) {
-            setStatus(data.presence);
+            setStatus(data.presence, data.workLocation);
         }
     } catch (e) {
         console.error('Failed to fetch status:', e);
