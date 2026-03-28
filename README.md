@@ -31,6 +31,7 @@ A workplace nameplate and presence display for a Raspberry Pi 4 connected to a 4
 - An Azure app registration with the following **application** permissions (admin consent required):
   - `User.Read.All`
   - `Presence.Read.All`
+  - `Calendars.Read` *(optional — enables the "Free After" indicator; omit to skip it)*
 
 ### Azure app registration setup
 

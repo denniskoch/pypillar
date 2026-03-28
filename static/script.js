@@ -77,6 +77,15 @@ async function fetchStatus() {
         if (data.presence) {
             setStatus(data.presence, data.workLocation);
         }
+
+        const freeAfterEl   = document.getElementById('free-after');
+        const freeAfterTime = document.getElementById('free-after-time');
+        if (data.freeAfter) {
+            freeAfterTime.textContent = data.freeAfter;
+            freeAfterEl.style.display = 'flex';
+        } else {
+            freeAfterEl.style.display = 'none';
+        }
     } catch (e) {
         console.error('Failed to fetch status:', e);
     }
