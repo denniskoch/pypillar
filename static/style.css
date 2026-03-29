@@ -192,7 +192,7 @@ body {
 
 .fact-label {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
     font-weight: 400;
     letter-spacing: 0.3em;
     color: #2979ff;
@@ -201,10 +201,10 @@ body {
 
 .fact-text {
     font-family: 'Raleway', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 300;
+    font-size: 1.5rem;
+    font-weight: 400;
     line-height: 1.6;
-    color: #8899bb;
+    color: #b0bdd0;
     opacity: 1;
     transform: translateY(0);
     transition: opacity 0.5s ease, transform 0.5s ease;
