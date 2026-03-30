@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pypillar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #080c14;
+            font-family: 'Raleway', sans-serif;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            text-align: center;
+            padding: 64px;
+        }
+
+        .accent-line {
+            width: 320px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #2979ff, transparent);
+        }
+
+        .label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            color: #2979ff;
+            text-transform: uppercase;
+        }
+
+        .heading {
+            font-family: 'Oswald', sans-serif;
+            font-size: 4rem;
+            font-weight: 400;
+            letter-spacing: 0.06em;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #7a8aaa;
+            letter-spacing: 0.05em;
+        }
+
+        .example {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: #aab4c8;
+            background: #0d1525;
+            padding: 14px 32px;
+            border: 1px solid #1e2d4a;
+            border-radius: 4px;
+        }
+
+        .example span { color: #2979ff; }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.6; }
+            50%       { opacity: 0.2; }
+        }
+
+        .glow {
+            width: 300px;
+            height: 40px;
+            background: #2979ff;
+            border-radius: 50%;
+            filter: blur(50px);
+            animation: breathe 4s ease-in-out infinite;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="label">pypillar</div>
+        <div class="accent-line"></div>
+        <div class="heading">NO USER SPECIFIED</div>
+        <div class="message">Navigate to a username to load a nameplate.</div>
+        <div class="example">/<span>username</span> &nbsp;·&nbsp; /<span>username</span>?layout=h</div>
+        <div class="glow"></div>
+    </div>
+</body>
+</html>

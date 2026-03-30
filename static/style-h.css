@@ -1,0 +1,252 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    font-family: 'Raleway', sans-serif;
+    color: #fff;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 1920px;
+    height: 480px;
+    background: #080c14;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── Column Divider ───────────────────────────────── */
+.col-divider {
+    width: 1px;
+    align-self: stretch;
+    background: linear-gradient(180deg, transparent, #2979ff 30%, #2979ff 70%, transparent);
+    opacity: 0.35;
+    flex-shrink: 0;
+}
+
+/* ── Identity Panel (left) ────────────────────────── */
+.identity-panel {
+    flex: 0 0 840px;
+    width: 840px;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 48px;
+    gap: 0;
+}
+
+.company-header {
+    margin-bottom: 20px;
+}
+
+.company-name {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    color: #aab4c8;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.accent-line {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #2979ff, transparent);
+}
+
+.name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 5.5rem;
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+    margin-bottom: 0.3em;
+    width: 100%;
+    overflow: hidden;
+}
+
+.name span {
+    white-space: nowrap;
+}
+
+.divider {
+    width: 240px;
+    height: 1px;
+    background: linear-gradient(90deg, #8899bb, transparent);
+    margin: 0 0 14px;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #c8d4e8;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── Status Panel (center) ────────────────────────── */
+.status-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    text-align: center;
+}
+
+.status-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 4.2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.4s ease;
+    line-height: 1;
+}
+
+.status-label.available { color: #22c55e; }
+.status-label.busy      { color: #ef4444; }
+.status-label.away      { color: #f59e0b; }
+
+/* ── Free After ───────────────────────────────────── */
+.free-after {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 16px;
+}
+
+.free-after-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+.free-after-time {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    opacity: 0.75;
+}
+
+.status-label.busy ~ .free-after .free-after-label,
+.status-label.busy ~ .free-after .free-after-time { color: #ef4444; }
+
+.remote-badge {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    opacity: 0.5;
+    margin-top: 4px;
+}
+
+/* ── Status Ambient Glow ──────────────────────────── */
+.status-glow {
+    position: absolute;
+    width: 480px;
+    height: 240px;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.15;
+    transition: background 1s ease;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ── Info Panel (right) ───────────────────────────── */
+.info-panel {
+    flex: 0 0 540px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 48px;
+    gap: 24px;
+}
+
+/* ── Clock ────────────────────────────────────────── */
+.clock-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.clock-time {
+    font-family: 'Oswald', sans-serif;
+    font-size: 5.5rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: #dde4f0;
+    line-height: 1;
+}
+
+.clock-date {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: #7a8aaa;
+    text-transform: uppercase;
+}
+
+/* ── Bottom Glow ──────────────────────────────────── */
+@keyframes breathe {
+    0%, 100% { opacity: 0.7; transform: translateY(-50%) scaleY(1.0); }
+    50%       { opacity: 0.25; transform: translateY(-50%) scaleY(0.75); }
+}
+
+.bottom-glow {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 120px;
+    height: 100%;
+    pointer-events: none;
+}
+
+.bottom-glow::after {
+    content: '';
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 300px;
+    background: #2979ff;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.5;
+    animation: breathe 4s ease-in-out infinite;
+}
+
+/* ── Clock Colon ──────────────────────────────────── */
+@keyframes colon-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.15; }
+}
+
+.clock-colon {
+    animation: colon-blink 1s ease-in-out infinite;
+    display: inline-block;
+}

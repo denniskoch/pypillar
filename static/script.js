@@ -1,3 +1,21 @@
+// ── Name auto-fit ─────────────────────────────────────
+function fitName(el, maxRem = 6.5, minRem = 2.0) {
+    // Use a Range to measure actual text width (element.getBoundingClientRect
+    // stretches to fill the line for inline elements inside a block container).
+    // maxPx = width of the .name h1 (direct parent), which already accounts
+    // for the .identity padding — no need to subtract it separately.
+    const maxPx = el.parentElement.clientWidth;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+
+    let size = maxRem;
+    el.style.fontSize = size + 'rem';
+    while (range.getBoundingClientRect().width > maxPx && size > minRem) {
+        size = Math.round((size - 0.1) * 10) / 10;
+        el.style.fontSize = size + 'rem';
+    }
+}
+
 // ── Status display ────────────────────────────────────
 const STATUS_GLOW_COLOR = {
     available: '#22c55e',
@@ -61,7 +79,7 @@ function setStatus(availability, workLocation) {
 // ── API polling ───────────────────────────────────────
 async function fetchStatus() {
     try {
-        const res  = await fetch('/api/status');
+        const res  = await fetch('/api/status/' + window.PYPILLAR_USERNAME);
         const data = await res.json();
 
         if (data.company) {
@@ -69,9 +87,25 @@ async function fetchStatus() {
         }
 
         if (data.profile) {
-            document.getElementById('name-first').textContent = data.profile.firstName;
-            document.getElementById('name-last').textContent  = data.profile.lastName;
-            document.getElementById('title').textContent      = data.profile.title;
+            const elFirst = document.getElementById('name-first');
+            const elLast  = document.getElementById('name-last');
+            elFirst.textContent = data.profile.firstName;
+            elLast.textContent  = data.profile.lastName;
+            document.getElementById('title').textContent = data.profile.title;
+            // Wait for webfonts before measuring so Oswald is used, not the fallback
+            document.fonts.ready.then(() => {
+                fitName(elFirst);
+                fitName(elLast);
+                // Both lines use the smaller of the two fitted sizes so neither dwarfs the other
+                const fittedRem = Math.min(
+                    parseFloat(elFirst.style.fontSize),
+                    parseFloat(elLast.style.fontSize)
+                );
+                elFirst.style.fontSize = fittedRem + 'rem';
+                elLast.style.fontSize  = fittedRem + 'rem';
+                // Set h1 font-size to the fitted size so em-based padding scales with the text
+                elFirst.parentElement.style.fontSize = fittedRem + 'rem';
+            });
         }
 
         if (data.presence) {
@@ -91,8 +125,18 @@ async function fetchStatus() {
     }
 }
 
-fetchStatus();
-setInterval(fetchStatus, 30_000);
+// Poll quickly until profile data arrives, then settle into normal 30s interval
+let _slowTimer = null;
+async function fetchStatusAndSettle() {
+    await fetchStatus();
+    const ready = !!document.getElementById('name-first').textContent;
+    if (ready && !_slowTimer) {
+        _slowTimer = setInterval(fetchStatus, 30_000);
+    } else if (!ready) {
+        setTimeout(fetchStatusAndSettle, 2_000);
+    }
+}
+fetchStatusAndSettle();
 
 // ── Clock ──────────────────────────────────────────────
 function updateClock() {
@@ -116,47 +160,3 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-// ── IT Facts ───────────────────────────────────────────
-let IT_FACTS = [];
-let factIndex = 0;
-
-function showFact() {
-    if (!IT_FACTS.length) return;
-    const el = document.getElementById('fact-text');
-
-    // slide + fade out downward
-    el.style.opacity   = '0';
-    el.style.transform = 'translateY(14px)';
-
-    setTimeout(() => {
-        factIndex      = (factIndex + 1) % IT_FACTS.length;
-        el.textContent = IT_FACTS[factIndex];
-
-        // snap above, no transition
-        el.style.transition = 'none';
-        el.style.transform  = 'translateY(-14px)';
-        el.style.opacity    = '0';
-
-        // force reflow so the snap is applied before re-enabling transition
-        el.getBoundingClientRect();
-
-        // slide + fade in upward
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        el.style.transform  = 'translateY(0)';
-        el.style.opacity    = '1';
-    }, 500);
-}
-
-async function loadFacts() {
-    try {
-        const res = await fetch('/facts.json');
-        IT_FACTS = await res.json();
-        factIndex = Math.floor(Math.random() * IT_FACTS.length);
-        document.getElementById('fact-text').textContent = IT_FACTS[factIndex];
-        setInterval(showFact, 12_000);
-    } catch (e) {
-        console.error('Failed to load facts:', e);
-    }
-}
-
-loadFacts();
