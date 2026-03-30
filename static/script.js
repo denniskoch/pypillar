@@ -21,13 +21,23 @@ const STATUS_GLOW_COLOR = {
     available: '#22c55e',
     busy:      '#ef4444',
     away:      '#f59e0b',
+    oof:       '#a855f7',
 };
 
-function setStatus(availability, workLocation) {
+function setStatus(availability, workLocation, outOfOffice) {
     const text = document.getElementById('status-text');
     const glow = document.getElementById('status-glow');
 
     text.className = 'status-label';
+
+    // OOF takes precedence over whatever availability reports
+    if (outOfOffice) {
+        text.classList.add('oof');
+        text.textContent = 'Out of Office';
+        glow.style.background = STATUS_GLOW_COLOR['oof'];
+        document.getElementById('free-after').style.display = 'none';
+        return;
+    }
 
     let label   = 'Offline';
     let glowKey = 'away';
@@ -56,6 +66,8 @@ function setStatus(availability, workLocation) {
             text.classList.add('away');
             label = 'Out of Office';
             break;
+        // outOfOfficeSettings.isOutOfOffice can be true even when availability
+        // doesn't explicitly say OutOfOffice (e.g. left OOF on, shows as Offline)
         case 'Away':
             text.classList.add('away');
             label = 'Away';
@@ -108,13 +120,11 @@ async function fetchStatus() {
             });
         }
 
-        if (data.presence) {
-            setStatus(data.presence, data.workLocation);
-        }
+        setStatus(data.presence, data.workLocation, data.outOfOffice);
 
         const freeAfterEl   = document.getElementById('free-after');
         const freeAfterTime = document.getElementById('free-after-time');
-        if (data.freeAfter) {
+        if (data.freeAfter && !data.outOfOffice) {
             freeAfterTime.textContent = data.freeAfter;
             freeAfterEl.style.display = 'flex';
         } else {

@@ -166,7 +166,7 @@ async def _poll_user(username: str) -> None:
             async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
                 entry = state.setdefault(username, {
                     "profile": None, "presence": "Unknown",
-                    "workLocation": None, "freeAfter": None,
+                    "workLocation": None, "freeAfter": None, "outOfOffice": False,
                 })
 
                 # Presence endpoint requires object ID (UPN returns PresenceUnknown).
@@ -199,6 +199,10 @@ async def _poll_user(username: str) -> None:
                     presence = presence_res.json()
                     entry["presence"]     = presence.get("availability", "Unknown")
                     entry["workLocation"] = (presence.get("workLocation") or {}).get("workLocationType")
+                    entry["outOfOffice"]  = (
+                        presence.get("availability") == "OutOfOffice"
+                        or bool((presence.get("outOfOfficeSettings") or {}).get("isOutOfOffice"))
+                    )
 
                 entry["freeAfter"] = await _get_free_after(client, headers, upn)
 
@@ -272,6 +276,7 @@ def get_status(username: str):
         "presence":     entry["presence"],
         "workLocation": entry["workLocation"],
         "freeAfter":    entry["freeAfter"],
+        "outOfOffice":  entry["outOfOffice"],
     })
 
 

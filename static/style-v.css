@@ -111,6 +111,7 @@ body {
 .status-label.available { color: #22c55e; }
 .status-label.busy      { color: #ef4444; }
 .status-label.away      { color: #f59e0b; }
+.status-label.oof       { color: #a855f7; }
 
 /* ── Free After ───────────────────────────────────── */
 .free-after {
