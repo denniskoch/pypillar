@@ -62,12 +62,7 @@ function setStatus(availability, workLocation, outOfOffice) {
             label = 'Be Right Back';
             showRemote = true;
             break;
-        case 'OutOfOffice':
-            text.classList.add('away');
-            label = 'Out of Office';
-            break;
-        // outOfOfficeSettings.isOutOfOffice can be true even when availability
-        // doesn't explicitly say OutOfOffice (e.g. left OOF on, shows as Offline)
+        // Note: OutOfOffice is handled above via the outOfOffice flag — never reaches here
         case 'Away':
             text.classList.add('away');
             label = 'Away';

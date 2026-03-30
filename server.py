@@ -67,13 +67,14 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 # ── MSAL ──────────────────────────────────────────────
 
+_msal_app = msal.ConfidentialClientApplication(
+    CLIENT_ID,
+    authority=f"https://login.microsoftonline.com/{TENANT_ID}",
+    client_credential=CLIENT_SECRET,
+)
+
 def _get_token() -> str:
-    client = msal.ConfidentialClientApplication(
-        CLIENT_ID,
-        authority=f"https://login.microsoftonline.com/{TENANT_ID}",
-        client_credential=CLIENT_SECRET,
-    )
-    result = client.acquire_token_for_client(scopes=SCOPES)
+    result = _msal_app.acquire_token_for_client(scopes=SCOPES)
     if "access_token" not in result:
         raise RuntimeError(f"Auth failed: {result.get('error_description')}")
     return result["access_token"]
@@ -95,6 +96,7 @@ def _parse_name(me: dict) -> tuple[str, str]:
 async def _get_free_after(
     client: httpx.AsyncClient, headers: dict, upn: str
 ) -> str | None:
+    # calendarView accepts UPN directly (unlike presence, which requires OID)
     try:
         now        = datetime.now(timezone.utc)
         end_window = now + timedelta(hours=8)
@@ -218,7 +220,7 @@ def _ensure_poller(username: str) -> None:
         _pollers.add(username)
         state.setdefault(username, {
             "profile": None, "presence": "Unknown",
-            "workLocation": None, "freeAfter": None,
+            "workLocation": None, "freeAfter": None, "outOfOffice": False,
         })
         asyncio.create_task(_poll_user(username))
 
