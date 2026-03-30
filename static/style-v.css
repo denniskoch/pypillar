@@ -18,6 +18,22 @@ body {
     height: 1920px;
     background: #080c14;
     overflow: hidden;
+    position: relative;
+}
+
+#starfield {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.company-header,
+.identity,
+.bottom-section,
+.bottom-glow {
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Company Header ───────────────────────────────── */
@@ -73,7 +89,7 @@ body {
 .divider {
     width: 260px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #8899bb, transparent);
+    background: linear-gradient(90deg, transparent, #2979ff, transparent);
     margin: 0 0 18px;
 }
 
@@ -220,18 +236,22 @@ body {
     position: relative;
 }
 
+@keyframes status-breathe {
+    0%, 100% { opacity: 0.18; transform: translate(-50%, -50%) scale(1.0); }
+    50%       { opacity: 0.07; transform: translate(-50%, -50%) scale(0.75); }
+}
+
 .status-glow {
     position: absolute;
     width: 360px;
     height: 120px;
     border-radius: 50%;
     filter: blur(55px);
-    opacity: 0.18;
     transition: background 1s ease;
     pointer-events: none;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    animation: status-breathe 4s ease-in-out infinite;
 }
 
 /* ── Clock Colon ──────────────────────────────────── */

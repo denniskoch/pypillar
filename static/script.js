@@ -1,3 +1,44 @@
+// ── Starfield ─────────────────────────────────────────
+(function () {
+    const container = document.querySelector('.container');
+    const canvas    = document.createElement('canvas');
+    canvas.id       = 'starfield';
+    container.insertBefore(canvas, container.firstChild);
+
+    const W = container.offsetWidth  || container.clientWidth;
+    const H = container.offsetHeight || container.clientHeight;
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const stars = Array.from({ length: 70 }, () => ({
+        x:     Math.random() * W,
+        y:     Math.random() * H,
+        r:     Math.random() * 0.9 + 0.3,   // 0.3 – 1.2 px
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.4 + 0.2,   // twinkle cycles per second
+        peak:  Math.random() * 0.35 + 0.1,  // max opacity 0.1 – 0.45
+    }));
+
+    let tick = 0;
+    function draw(ts) {
+        tick++;
+        if (tick % 4 === 0) {              // ~15 fps — easy on the Pi
+            const t = ts * 0.001;
+            ctx.clearRect(0, 0, W, H);
+            for (const s of stars) {
+                const o = ((Math.sin(t * s.speed * Math.PI * 2 + s.phase) + 1) / 2) * s.peak;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(180,210,255,${o.toFixed(3)})`;
+                ctx.fill();
+            }
+        }
+        requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+})();
+
 // ── Name auto-fit ─────────────────────────────────────
 function fitName(el, maxRem = 6.5, minRem = 2.0) {
     // Use a Range to measure actual text width (element.getBoundingClientRect
