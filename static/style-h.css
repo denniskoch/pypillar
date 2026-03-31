@@ -166,11 +166,6 @@ body {
 }
 
 /* ── Status Ambient Glow ──────────────────────────── */
-@keyframes status-breathe {
-    0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1.0); }
-    50%       { opacity: 0.06; transform: translate(-50%, -50%) scale(0.75); }
-}
-
 .status-glow {
     position: absolute;
     width: 480px;
@@ -181,7 +176,8 @@ body {
     pointer-events: none;
     top: 50%;
     left: 50%;
-    animation: status-breathe 4s ease-in-out infinite;
+    opacity: 0.15;
+    transform: translate(-50%, -50%);
 }
 
 /* ── Info Panel (right) ───────────────────────────── */
@@ -222,11 +218,6 @@ body {
 }
 
 /* ── Bottom Glow ──────────────────────────────────── */
-@keyframes breathe {
-    0%, 100% { opacity: 0.7; transform: translateY(-50%) scaleY(1.0); }
-    50%       { opacity: 0.25; transform: translateY(-50%) scaleY(0.75); }
-}
-
 .bottom-glow {
     position: absolute;
     right: 0;
@@ -234,21 +225,6 @@ body {
     width: 120px;
     height: 100%;
     pointer-events: none;
-}
-
-.bottom-glow::after {
-    content: '';
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 300px;
-    background: #2979ff;
-    border-radius: 50%;
-    filter: blur(50px);
-    opacity: 0.5;
-    animation: breathe 4s ease-in-out infinite;
 }
 
 /* ── Clock Colon ──────────────────────────────────── */

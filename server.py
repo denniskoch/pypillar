@@ -283,7 +283,7 @@ def get_status(username: str):
 
 
 @app.get("/{username}")
-async def nameplate(username: str, request: Request, layout: str = "v"):
+async def nameplate(username: str, request: Request, layout: str = "v", background: str = ""):
     if not SLUG_RE.match(username):
         return JSONResponse({"detail": "Invalid username"}, status_code=400)
 
@@ -297,8 +297,11 @@ async def nameplate(username: str, request: Request, layout: str = "v"):
     def _v(name: str) -> str:
         return str(int((STATIC_DIR / name).stat().st_mtime))
 
+    # Sanitise background value — alphanumeric only
+    bg = background.lower() if re.match(r'^[a-z0-9-]+$', background) else ""
+
     # Inject username + replace asset URLs with versioned equivalents
-    injection = f'<script>window.PYPILLAR_USERNAME = "{username}";</script>\n'
+    injection = f'<script>window.PYPILLAR_USERNAME = "{username}"; window.PYPILLAR_BACKGROUND = "{bg}";</script>\n'
     html = html.replace("<script src=\"script.js\"></script>",
                         injection + f'    <script src="/static/script.js?v={_v("script.js")}"></script>')
     html = html.replace(f'href="/static/{css_file}"',

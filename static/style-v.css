@@ -204,11 +204,6 @@ body {
 }
 
 /* ── Bottom Glow ──────────────────────────────────── */
-@keyframes breathe {
-    0%, 100% { opacity: 0.7; transform: translateX(-50%) scaleX(1.0); }
-    50%       { opacity: 0.25; transform: translateX(-50%) scaleX(0.75); }
-}
-
 .bottom-glow {
     width: 100%;
     height: 200px;
@@ -216,29 +211,9 @@ body {
     flex-shrink: 0;
 }
 
-.bottom-glow::after {
-    content: '';
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 320px;
-    height: 50px;
-    background: #2979ff;
-    border-radius: 50%;
-    filter: blur(50px);
-    opacity: 0.7;
-    animation: breathe 4s ease-in-out infinite;
-}
-
 /* ── Status Ambient Glow ──────────────────────────── */
 .status-section {
     position: relative;
-}
-
-@keyframes status-breathe {
-    0%, 100% { opacity: 0.18; transform: translate(-50%, -50%) scale(1.0); }
-    50%       { opacity: 0.07; transform: translate(-50%, -50%) scale(0.75); }
 }
 
 .status-glow {
@@ -251,7 +226,8 @@ body {
     pointer-events: none;
     top: 50%;
     left: 50%;
-    animation: status-breathe 4s ease-in-out infinite;
+    opacity: 0.18;
+    transform: translate(-50%, -50%);
 }
 
 /* ── Clock Colon ──────────────────────────────────── */
