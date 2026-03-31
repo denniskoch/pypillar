@@ -1,8 +1,8 @@
-// ── Starfield ─────────────────────────────────────────
+// ── Background ────────────────────────────────────────
 (function () {
     const container = document.querySelector('.container');
     const canvas    = document.createElement('canvas');
-    canvas.id       = 'starfield';
+    canvas.id       = 'background';
     container.insertBefore(canvas, container.firstChild);
 
     const W = container.offsetWidth  || container.clientWidth;
@@ -11,29 +11,164 @@
     canvas.height = H;
     const ctx = canvas.getContext('2d');
 
-    const stars = Array.from({ length: 70 }, () => ({
-        x:     Math.random() * W,
-        y:     Math.random() * H,
-        r:     Math.random() * 0.9 + 0.3,   // 0.3 – 1.2 px
-        phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.4 + 0.2,   // twinkle cycles per second
-        peak:  Math.random() * 0.35 + 0.1,  // max opacity 0.1 – 0.45
+    // ── Vignette — pre-rendered, applied last ──
+    const vigCanvas = document.createElement('canvas');
+    vigCanvas.width = W; vigCanvas.height = H;
+    const vCtx = vigCanvas.getContext('2d');
+    const vig = vCtx.createRadialGradient(W/2, H/2, H * 0.25, W/2, H/2, H * 0.9);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.65)');
+    vCtx.fillStyle = vig;
+    vCtx.fillRect(0, 0, W, H);
+
+    // ── Glare sweep state ──
+    let glareX      = -W * 0.5;   // current left edge of the sweep band
+    let glareSpeed  = 0;
+    let glareActive = false;
+    let glareTimer  = 120 + Math.random() * 300;
+
+    function launchGlare() {
+        glareX      = -W * 0.35;
+        glareSpeed  = W / (55 + Math.random() * 35); // cross screen in ~1.5–2.5 s @60fps
+        glareActive = true;
+    }
+
+    // ── Floating orbs (slow drifting colour blobs) ──
+    const orbs = [
+        { cx: W * 0.15, cy: H * 0.5,  r: H * 1.1, hue: 220, sat: 80, vy:  0.06, vx: 0.04, phase: 0.0  },
+        { cx: W * 0.55, cy: H * 0.3,  r: H * 0.9, hue: 195, sat: 90, vy: -0.05, vx: 0.03, phase: 1.2  },
+        { cx: W * 0.80, cy: H * 0.6,  r: H * 1.0, hue: 260, sat: 70, vy:  0.04, vx:-0.05, phase: 2.5  },
+        { cx: W * 0.35, cy: H * 0.8,  r: H * 0.7, hue: 185, sat: 85, vy: -0.03, vx: 0.06, phase: 0.8  },
+    ];
+
+    // ── Terminal rain columns ──
+    const FONT_H  = 14;
+    const FONT_W  = 8;
+    const COLS    = Math.floor(W / FONT_W);
+    const ROWS    = Math.floor(H / FONT_H);
+    const CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>{}[]|/\\=+-_:;.,?!@#$%^&*()';
+
+    // Each column: y position (in rows), speed (rows/sec), and its character strip
+    const cols = Array.from({ length: COLS }, (_, i) => ({
+        x:       i * FONT_W,
+        y:      -Math.floor(Math.random() * ROWS * 2),  // stagger start
+        speed:   2 + Math.random() * 4,                   // rows per second
+        chars:   Array.from({ length: ROWS + 5 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]),
+        mutateAt: Math.floor(Math.random() * 60),
     }));
 
-    let tick = 0;
-    function draw(ts) {
-        tick++;
-        if (tick % 4 === 0) {              // ~15 fps — easy on the Pi
-            const t = ts * 0.001;
-            ctx.clearRect(0, 0, W, H);
-            for (const s of stars) {
-                const o = ((Math.sin(t * s.speed * Math.PI * 2 + s.phase) + 1) / 2) * s.peak;
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(180,210,255,${o.toFixed(3)})`;
-                ctx.fill();
+    // Pre-render the text layer into an offscreen canvas, updated at ~12fps
+    const textCanvas = document.createElement('canvas');
+    textCanvas.width  = W;
+    textCanvas.height = H;
+    const tCtx = textCanvas.getContext('2d');
+    tCtx.font = `${FONT_H}px monospace`;
+    tCtx.textBaseline = 'top';
+
+    let textTick  = 0;
+    let lastTextT = 0;
+
+    function updateText(t, dt) {
+        textTick++;
+        // Update at ~12 fps to keep it cheap
+        if (textTick % 5 !== 0) return;
+
+        tCtx.clearRect(0, 0, W, H);
+
+        for (const col of cols) {
+            // Advance position
+            col.y += col.speed * dt;
+            if (col.y > ROWS * 2) {
+                col.y = -Math.floor(Math.random() * ROWS);
+                col.speed = 2 + Math.random() * 4;
+                col.chars = Array.from({ length: ROWS + 5 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]);
+            }
+            // Occasionally mutate a random character in the strip
+            col.mutateAt--;
+            if (col.mutateAt <= 0) {
+                const idx = Math.floor(Math.random() * col.chars.length);
+                col.chars[idx] = CHARS[Math.floor(Math.random() * CHARS.length)];
+                col.mutateAt = 8 + Math.floor(Math.random() * 30);
+            }
+
+            const headRow = Math.floor(col.y);
+            for (let r = 0; r < ROWS; r++) {
+                const charIdx = headRow - r;
+                if (charIdx < 0 || charIdx >= col.chars.length) continue;
+                // Fade: chars near the head are brighter
+                const dist = headRow - r;
+                const fade = Math.max(0, 1 - dist / 18);
+                if (fade < 0.04) continue;
+                const alpha = fade * 0.22;  // max ~22% opacity
+                tCtx.fillStyle = `rgba(140,200,255,${alpha.toFixed(3)})`;
+                tCtx.fillText(col.chars[charIdx], col.x, r * FONT_H);
             }
         }
+    }
+
+    let last = 0;
+    function draw(ts) {
+        const dt = Math.min((ts - last) / 1000, 0.05);
+        last = ts;
+        const t = ts * 0.001;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // ── Plasma orbs ──
+        for (const o of orbs) {
+            // Gently drift using sinusoidal motion
+            const cx = o.cx + Math.sin(t * o.vx + o.phase) * W * 0.12;
+            const cy = o.cy + Math.sin(t * o.vy + o.phase * 1.3) * H * 0.25;
+            // Slowly rotate hue
+            const hue = (o.hue + t * 4) % 360;
+            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, o.r);
+            grad.addColorStop(0,   `hsla(${hue},${o.sat}%,38%,0.55)`);
+            grad.addColorStop(0.5, `hsla(${hue},${o.sat}%,22%,0.25)`);
+            grad.addColorStop(1,   'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+        }
+
+        // ── Subtle horizontal banding (depth / LCD backlighting feel) ──
+        const bandGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bandGrad.addColorStop(0,   'rgba(255,255,255,0.03)');
+        bandGrad.addColorStop(0.5, 'rgba(255,255,255,0.07)');
+        bandGrad.addColorStop(1,   'rgba(255,255,255,0.02)');
+        ctx.fillStyle = bandGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // ── Glare sweep ──
+        if (!glareActive) {
+            glareTimer -= dt * 60;
+            if (glareTimer <= 0) {
+                launchGlare();
+                glareTimer = 180 + Math.random() * 400;
+            }
+        } else {
+            glareX += glareSpeed;
+            const bw = W * 0.32;
+            const glareGrad = ctx.createLinearGradient(glareX, 0, glareX + bw, 0);
+            glareGrad.addColorStop(0,    'rgba(255,255,255,0)');
+            glareGrad.addColorStop(0.3,  'rgba(255,255,255,0.07)');
+            glareGrad.addColorStop(0.5,  'rgba(255,255,255,0.13)');
+            glareGrad.addColorStop(0.7,  'rgba(255,255,255,0.07)');
+            glareGrad.addColorStop(1,    'rgba(255,255,255,0)');
+            ctx.fillStyle = glareGrad;
+            // Slight diagonal tilt: narrow strip from top to bottom offset
+            ctx.save();
+            ctx.transform(1, 0, -0.15, 1, 0, 0);
+            ctx.fillRect(glareX, 0, bw, H);
+            ctx.restore();
+            if (glareX > W * 1.1) glareActive = false;
+        }
+
+        // ── Terminal rain (very faint) ──
+        updateText(t, dt);
+        ctx.drawImage(textCanvas, 0, 0);
+
+        // ── Vignette ──
+        ctx.drawImage(vigCanvas, 0, 0);
+
         requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);

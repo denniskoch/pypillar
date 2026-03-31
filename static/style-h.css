@@ -21,7 +21,7 @@ body {
     position: relative;
 }
 
-#starfield {
+#background {
     position: absolute;
     inset: 0;
     pointer-events: none;
