@@ -79,6 +79,25 @@ cp .env.example .env
 
 ## Running
 
+### Docker (recommended)
+
+A `Dockerfile` and `docker-compose.yml` are included for containerised deployments.
+
+```bash
+cp .env.example .env   # fill in your values first
+docker compose up -d
+```
+
+This builds the image from source, binds port `8000`, loads `.env`, and restarts automatically unless manually stopped.
+
+To rebuild after a code change:
+
+```bash
+docker compose up -d --build
+```
+
+### Bare metal
+
 ```bash
 uvicorn server:app --host 0.0.0.0 --port 8000
 ```
@@ -149,6 +168,8 @@ pypillar/
 ├── server.py            # FastAPI backend — MSAL auth, Graph polling, routing
 ├── requirements.txt
 ├── .env.example
+├── Dockerfile
+├── docker-compose.yml
 └── static/
     ├── index-v.html     # Portrait layout (480×1920)
     ├── index-h.html     # Landscape layout
