@@ -2,7 +2,7 @@
 
 A workplace nameplate and presence display for a Raspberry Pi 4 connected to a 480×1920 portrait LCD. Shows your name, job title, and real-time Microsoft Teams availability — pulled live from Microsoft Graph.
 
-![Dark themed display showing name, status, clock, and IT facts]
+![Dark themed display showing name, status, and clock]
 
 ---
 
@@ -12,7 +12,6 @@ A workplace nameplate and presence display for a Raspberry Pi 4 connected to a 4
 - **Free After** — shows end of current busy block when in a meeting (requires `Calendars.Read`)
 - **Ambient glow** — background color shifts with your status
 - **Clock** — 12-hour time with blinking colon and full date
-- **Rotating facts** — IT trivia cycles every 12 seconds
 - **Multi-user** — single server instance handles multiple nameplates via `/{username}`
 - **Zero interaction** — fully automated after boot
 
@@ -175,7 +174,6 @@ pypillar/
     ├── index-h.html     # Landscape layout
     ├── style-v.css      # Portrait styles
     ├── style-h.css      # Landscape styles
-    ├── script.js        # API polling, clock, fact rotation, name auto-fit
-    ├── error.html       # Shown at / when no username is provided
-    └── facts.json       # IT trivia
+    ├── script.js        # API polling, clock, name auto-fit
+    └── error.html       # Shown at / when no username is provided
 ```
