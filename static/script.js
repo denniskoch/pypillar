@@ -299,7 +299,11 @@ async function fetchStatus() {
         const freeAfterEl   = document.getElementById('free-after');
         const freeAfterTime = document.getElementById('free-after-time');
         if (data.freeAfter && !data.outOfOffice) {
-            freeAfterTime.textContent = data.freeAfter;
+            const d    = new Date(data.freeAfter);
+            const h    = d.getHours() % 12 || 12;
+            const m    = String(d.getMinutes()).padStart(2, '0');
+            const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+            freeAfterTime.textContent = `${h}:${m} ${ampm}`;
             freeAfterEl.style.display = 'flex';
         } else {
             freeAfterEl.style.display = 'none';

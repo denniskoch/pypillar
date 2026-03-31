@@ -143,11 +143,7 @@ async def _get_free_after(
         if not block_end or block_end <= now:
             return None
 
-        local_end = block_end.astimezone()
-        h    = local_end.hour % 12 or 12
-        m    = local_end.strftime("%M")
-        ampm = "PM" if local_end.hour >= 12 else "AM"
-        return f"{h}:{m} {ampm}"
+        return block_end.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     except Exception:
         return None
